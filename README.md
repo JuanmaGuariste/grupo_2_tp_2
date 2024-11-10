@@ -1,4 +1,4 @@
-# Repositorio de entrega de TP 12 del grupo 2
+# Repositorio de entrega de TP 2 del grupo 2
 
 ## Integrantes
 
