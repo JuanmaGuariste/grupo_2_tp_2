@@ -43,9 +43,14 @@ extern "C" {
 /********************** inclusions *******************************************/
 
 /********************** macros ***********************************************/
-
+#define MAX_QUEUE_LENGTH 10
 /********************** typedef **********************************************/
-
+typedef enum {
+    RED_LED_AO_ID = 1,
+    GREEN_LED_AO_ID,
+    BLUE_LED_AO_ID,
+    UI_INTERFACE_AO_ID
+} obj_id_t;
 /********************** external data declaration ****************************/
 
 /********************** external functions declaration ***********************/

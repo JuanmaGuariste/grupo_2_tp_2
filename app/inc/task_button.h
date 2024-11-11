@@ -42,6 +42,7 @@ extern "C" {
 
 /********************** inclusions *******************************************/
 #include "ao.h"
+#include "app.h"
 /********************** macros ***********************************************/
 
 /********************** typedef **********************************************/
@@ -59,6 +60,8 @@ typedef struct {
     active_object_t *red_led_obj;
     active_object_t *green_led_obj;
     active_object_t *blue_led_obj;
+    obj_id_t *current_obj_id;
+    event_callback_t free_payload;
 } button_event_t;
 /********************** external data declaration ****************************/
 

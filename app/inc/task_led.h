@@ -55,10 +55,6 @@ typedef enum
   LED_COLOR__N,
 } led_color_t;
 
-typedef struct {
-    QueueHandle_t led_interface;
-} ao_led_interface_t;
-
 /********************** external data declaration ****************************/
 
 /********************** external functions declaration ***********************/
@@ -66,7 +62,7 @@ typedef struct {
 void handle_red_led_event(event_data_t event);
 void handle_green_led_event(event_data_t event);
 void handle_blue_led_event(event_data_t event);
-void init_led_active_object(active_object_t *led_obj, void (*callback)(event_data_t), uint8_t priority);
+void init_led_active_object(active_object_t* hao, uint8_t priority);
 /********************** End of CPP guard *************************************/
 #ifdef __cplusplus
 }
