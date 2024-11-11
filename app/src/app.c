@@ -69,9 +69,9 @@
 void app_init(void)
 {
   // Inicialización para log
-  red_led_obj.obj_id = LED_COLOR_RED;
-  green_led_obj.obj_id = LED_COLOR_GREEN;
-  blue_led_obj.obj_id = LED_COLOR_BLUE;
+  red_led_obj.obj_id = RED_LED_AO_ID;
+  green_led_obj.obj_id = GREEN_LED_AO_ID;
+  blue_led_obj.obj_id = BLUE_LED_AO_ID;
   ui_interface.obj_id = UI_INTERFACE_AO_ID;
 
   init_led_active_object(&red_led_obj, LED_AO_TASK_PRIORITY);
