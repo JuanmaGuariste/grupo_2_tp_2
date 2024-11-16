@@ -20,19 +20,19 @@ typedef struct
     int value;
 } ao_led_message_t;
 
-typedef struct
-{
-    active_object_t* hao;
-    event_data_t payload;
-
-} ao_event_t;
-
 typedef struct {
     QueueHandle_t event_queue;
     event_callback_t process_event;
     uint8_t event_size;
     uint8_t obj_id;
 } active_object_t;
+
+typedef struct
+{
+    active_object_t* hao;
+    event_data_t payload;
+
+} ao_event_t;
 
 void active_object_init(active_object_t *obj,
                         event_callback_t process_event,
