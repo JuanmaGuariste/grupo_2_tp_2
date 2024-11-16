@@ -52,6 +52,7 @@
 #define BUTTON_TASK_PRIORITY (tskIDLE_PRIORITY + 1)
 /********************** internal data declaration ****************************/
   static active_object_t red_led_obj, green_led_obj, blue_led_obj, ui_interface;
+
   static all_obt_t all_obj = {
     .blue_led = &blue_led_obj,
     .green_led = &green_led_obj,
