@@ -71,7 +71,7 @@ void init_ui_active_object(active_object_t *ui_obj, void (*callback)(event_data_
 void ui_process_event(event_data_t event) {
     button_event_t *button_event = (button_event_t *) event;
 
-    LOGGER_INFO("UI processor: got event.");
+	LOGGER_INFO("UI processor got button type: %d\n", button_event->type);
 
     // char *handler_to_exec = NULL;
     
