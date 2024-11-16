@@ -114,6 +114,6 @@ void handle_blue_led_event(event_data_t event) {
 // }
 
 void init_led_active_object(active_object_t* hao, uint8_t priority) {
-  active_object_init(hao,evt_process_callback,MAX_QUEUE_LENGTH,priority);
+  active_object_init(hao, evt_process_callback, MAX_QUEUE_LENGTH, priority);
 }
 /********************** end of file ******************************************/

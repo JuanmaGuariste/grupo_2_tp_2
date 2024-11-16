@@ -36,7 +36,6 @@ void active_object_init(active_object_t *obj,
 
 #ifdef ONLY_THREAD
     static bool init = false;
-    if (init) return;
 #endif
 
     obj->event_size = sizeof(event_data_t);
@@ -52,6 +51,10 @@ void active_object_init(active_object_t *obj,
         // error
     }
 
+    if (init) {
+    	return; // we only allow 1 task to exist
+    }
+
     BaseType_t status;
     status = xTaskCreate(active_object_task, "Task", configMINIMAL_STACK_SIZE, obj, task_priority, NULL);
     configASSERT(pdPASS == status);
@@ -59,11 +62,14 @@ void active_object_init(active_object_t *obj,
 #ifdef ONLY_THREAD
     init = true;
 #endif
+
+	LOGGER_INFO("Created active_object_task.\n");
 }
 
 void active_object_send_event(event_data_t event) {
     ao_event_t *evt = (ao_event_t*)event;
-    xQueueSend(evt->hao->event_queue, &evt->payload, 0);
+	LOGGER_INFO("Going to send payload event to Active Object.\n");
+    xQueueSend(evt->hao->event_queue, &(evt->payload), 0);
 	LOGGER_INFO("Sent payload event to Active Object.\n");
 }
 
