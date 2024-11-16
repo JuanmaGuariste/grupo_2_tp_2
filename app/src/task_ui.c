@@ -71,25 +71,27 @@ void init_ui_active_object(active_object_t *ui_obj, void (*callback)(event_data_
 void ui_process_event(event_data_t event) {
     button_event_t *button_event = (button_event_t *) event;
 
-	LOGGER_INFO("UI processor got button type: %d\n", button_event->type);
+    LOGGER_INFO("UI processor: got button type = %d\n", *(button_event->type));
 
-    // char *handler_to_exec = NULL;
-    
-    switch (button_event->type) {
-      case BUTTON_TYPE_PULSE:
-        active_object_send_event(button_event->red_led_obj);
-        // handler_to_exec = "button_event->red_led_obj";
-        break;
-      case BUTTON_TYPE_SHORT:
-        active_object_send_event(button_event->green_led_obj);
-        // handler_to_exec = "button_event->green_led_obj";
-        break;
-      case BUTTON_TYPE_LONG:
-        active_object_send_event(button_event->blue_led_obj);
-        // handler_to_exec = "button_event->blue_led_obj";
-        break;
-      default:
-        break;
+    if (button_event->current_obj_id != NULL) {
+        LOGGER_INFO("UI processor: current object ID: %d\n", *(button_event->current_obj_id));
+    } else {
+        LOGGER_INFO("UI processor: current object ID is NULL.\n");
+    }
+
+    switch (*(button_event->type)) {
+        case BUTTON_TYPE_PULSE:
+            active_object_send_event(button_event->red_led_obj);
+            break;
+        case BUTTON_TYPE_SHORT:
+            active_object_send_event(button_event->green_led_obj);
+            break;
+        case BUTTON_TYPE_LONG:
+            active_object_send_event(button_event->blue_led_obj);
+            break;
+        default:
+            LOGGER_INFO("Unknown button type: %d\n", *(button_event->type));
+            break;
     }
 
 //  LOGGER_INFO("Se ejecuta ui_process_event button type: %d\n"

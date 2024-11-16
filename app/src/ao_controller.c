@@ -14,10 +14,12 @@ void evt_process_callback (event_data_t event) {
   button_event_t *payload = (button_event_t *)event;
 
   if (payload->current_obj_id != NULL) {
-	  LOGGER_INFO("Current object ID: %d\n", *(payload->current_obj_id));
+	  LOGGER_INFO("evt_process_callback object ID: %d\n", *(payload->current_obj_id));
   } else {
-	  LOGGER_INFO("Current object ID is NULL.\n");
+	  LOGGER_INFO("evt_process_callback object ID is NULL.\n");
   }
+
+  LOGGER_INFO("evt_process_callback: got button type = %d\n", *(payload->type));
 
   switch (*(payload->current_obj_id)) {
     case RED_LED_AO_ID:

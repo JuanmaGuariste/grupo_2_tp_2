@@ -119,11 +119,12 @@ void task_button(void* argument)
   {
     GPIO_PinState button_state;
     button_state = HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN);
+
     button_type_t type;
     type = button_process_state_(button_state);
 
     if (type != BUTTON_TYPE_NONE){
-		LOGGER_INFO("Button type = %d", type);
+    	LOGGER_INFO("Button task: button type = %d", type);
 
     	event.hao = ui_interface->ui_obj;
 
@@ -131,20 +132,19 @@ void task_button(void* argument)
 
     	if (payload != NULL){
     		payload->blue_led_obj = ui_interface->blue_led;
-			payload->green_led_obj = ui_interface->green_led;
-			payload->red_led_obj = ui_interface->red_led;
-			payload->current_obj_id =  &(ui_interface->ui_obj->obj_id);
+    		payload->green_led_obj = ui_interface->green_led;
+    		payload->red_led_obj = ui_interface->red_led;
+    		payload->current_obj_id =  &(ui_interface->ui_obj->obj_id);
+    		payload->type = &type;
 
-			event.payload = payload;
+    		event.payload = payload;
 
-		    LOGGER_INFO("Current object ID: %d", *((button_event_t *)event.payload )->current_obj_id);
+    		LOGGER_INFO("Button task: current object ID: %d", *((button_event_t *)event.payload )->current_obj_id);
 
-		    active_object_send_event(&event);
-
-		    LOGGER_INFO("Sent button task event to UI active object.");
+    		active_object_send_event(&event);
+    		LOGGER_INFO("Button task: sent button task event to UI active object.");
     	}
     }
-
     vTaskDelay((TickType_t)(TASK_PERIOD_MS_ / portTICK_PERIOD_MS));
   }
 }
