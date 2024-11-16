@@ -5,8 +5,10 @@
 */
 #include "ao_controller.h"
 
-evt_process_callback (event_data_t event) {
-  if (event == NULL) return;
+void evt_process_callback (event_data_t event) {
+  if (event == NULL) {
+	  return;
+  }
   
   button_event_t *payload = (button_event_t *)event;
   switch ((int)payload->current_obj_id) {
