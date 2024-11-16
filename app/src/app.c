@@ -46,6 +46,8 @@
 
 #include "ao.h"
 
+#include "ao_controller.h"
+
 /********************** macros and definitions *******************************/
 #define LED_AO_TASK_PRIORITY (tskIDLE_PRIORITY + 1)
 #define UI_AO_TASK_PRIORITY (tskIDLE_PRIORITY + 1)
@@ -75,11 +77,11 @@ void app_init(void)
   blue_led_obj.obj_id = BLUE_LED_AO_ID;
   ui_interface.obj_id = UI_INTERFACE_AO_ID;
 
-  init_led_active_object(&red_led_obj, LED_AO_TASK_PRIORITY);
-  init_led_active_object(&green_led_obj, LED_AO_TASK_PRIORITY);
-  init_led_active_object(&blue_led_obj, LED_AO_TASK_PRIORITY);
+  // init_led_active_object(&red_led_obj, LED_AO_TASK_PRIORITY);
+  // init_led_active_object(&green_led_obj, LED_AO_TASK_PRIORITY);
+  // init_led_active_object(&blue_led_obj, LED_AO_TASK_PRIORITY);
 
-  init_ui_active_object(&ui_interface, ui_process_event, UI_AO_TASK_PRIORITY);
+  init_ui_active_object(&ui_interface, evt_process_callback, UI_AO_TASK_PRIORITY);
 
   BaseType_t status;
 

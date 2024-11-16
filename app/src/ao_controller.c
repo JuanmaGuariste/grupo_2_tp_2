@@ -9,9 +9,17 @@ void evt_process_callback (event_data_t event) {
   if (event == NULL) {
 	  return;
   }
-  
+  LOGGER_INFO("evt_process_callback: got event.\n");
+
   button_event_t *payload = (button_event_t *)event;
-  switch ((int)payload->current_obj_id) {
+
+  if (payload->current_obj_id != NULL) {
+	  LOGGER_INFO("Current object ID: %d\n", *(payload->current_obj_id));
+  } else {
+	  LOGGER_INFO("Current object ID is NULL.\n");
+  }
+
+  switch (*(payload->current_obj_id)) {
     case RED_LED_AO_ID:
       handle_red_led_event(event);
       break;
@@ -22,6 +30,7 @@ void evt_process_callback (event_data_t event) {
       handle_blue_led_event(event);
       break;
     case UI_INTERFACE_AO_ID:
+  	  LOGGER_INFO("Entered UI Active Object switch case.\n");
       ui_process_event(event);
       break;
 

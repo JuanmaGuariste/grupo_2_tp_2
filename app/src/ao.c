@@ -64,6 +64,7 @@ void active_object_init(active_object_t *obj,
 void active_object_send_event(event_data_t event) {
     ao_event_t *evt = (ao_event_t*)event;
     xQueueSend(evt->hao->event_queue, &evt->payload, 0);
+	LOGGER_INFO("Sent payload event to Active Object.\n");
 }
 
 void active_object_task(void *pv_parameters) {
@@ -72,6 +73,7 @@ void active_object_task(void *pv_parameters) {
 
     for (;;) {
         if (xQueueReceive(obj->event_queue, &payload, portMAX_DELAY) == pdTRUE)
+        	LOGGER_INFO("AO task: got payload from event queue.\n");
             obj->process_event(payload);
     }
 }

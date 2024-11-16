@@ -111,32 +111,38 @@ void task_button(void* argument)
   all_obt_t *ui_interface = (all_obt_t *) argument;
   ao_event_t event;
 
-  // event.blue_led_obj = ui_interface->blue_led;
-  // event.green_led_obj = ui_interface->green_led;
-  // event.red_led_obj = ui_interface->red_led;
+  LOGGER_INFO("Button task initialized");
   
   button_init_();
 
   while(true)
   {
-
     GPIO_PinState button_state;
     button_state = HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN);
     button_type_t type;
     type = button_process_state_(button_state);
 
     if (type != BUTTON_TYPE_NONE){
-      event.hao = ui_interface->ui_obj;
-      button_event_t *payload = pvPortMalloc(sizeof(button_event_t));
+		LOGGER_INFO("Button type = %d", type);
 
-      if (payload != NULL){
-        payload->blue_led_obj = ui_interface->blue_led;
-        payload->green_led_obj = ui_interface->green_led;
-        payload->red_led_obj = ui_interface->red_led;
-        payload->current_obj_id =  &(ui_interface->ui_obj->obj_id);
-        event.payload = payload;
-        active_object_send_event(&event);
-      }
+    	event.hao = ui_interface->ui_obj;
+
+    	button_event_t *payload = pvPortMalloc(sizeof(button_event_t));
+
+    	if (payload != NULL){
+    		payload->blue_led_obj = ui_interface->blue_led;
+			payload->green_led_obj = ui_interface->green_led;
+			payload->red_led_obj = ui_interface->red_led;
+			payload->current_obj_id =  &(ui_interface->ui_obj->obj_id);
+
+			event.payload = payload;
+
+		    LOGGER_INFO("Current object ID: %d", *((button_event_t *)event.payload )->current_obj_id);
+
+		    active_object_send_event(&event);
+
+		    LOGGER_INFO("Sent button task event to UI active object.");
+    	}
     }
 
     vTaskDelay((TickType_t)(TASK_PERIOD_MS_ / portTICK_PERIOD_MS));

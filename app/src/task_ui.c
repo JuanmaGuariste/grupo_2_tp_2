@@ -65,11 +65,14 @@
 
 /*************************************************************************** */
 void init_ui_active_object(active_object_t *ui_obj, void (*callback)(event_data_t), uint8_t priority) {
-  active_object_init(ui_obj,evt_process_callback,MAX_QUEUE_LENGTH,priority);
+  active_object_init(ui_obj, callback , MAX_QUEUE_LENGTH, priority);
 }
 
 void ui_process_event(event_data_t event) {
     button_event_t *button_event = (button_event_t *) event;
+
+    LOGGER_INFO("UI processor: got event.");
+
     // char *handler_to_exec = NULL;
     
     switch (button_event->type) {
