@@ -31,7 +31,6 @@ typedef struct
 {
     active_object_t* hao;
     event_data_t payload;
-
 } ao_event_t;
 
 void active_object_init(active_object_t *obj,

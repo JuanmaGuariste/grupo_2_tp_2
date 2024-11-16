@@ -134,7 +134,7 @@ void task_button(void* argument)
         payload->blue_led_obj = ui_interface->blue_led;
         payload->green_led_obj = ui_interface->green_led;
         payload->red_led_obj = ui_interface->red_led;
-        payload->current_obj_id = ui_interface->ui_obj->obj_id;
+        payload->current_obj_id =  &(ui_interface->ui_obj->obj_id);
         event.payload = payload;
 
         active_object_send_event(&event);
