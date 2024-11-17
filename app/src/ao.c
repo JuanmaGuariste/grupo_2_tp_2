@@ -8,7 +8,7 @@
 #include "logger.h"
 #define ONLY_THREAD
 
-QueueHandle_t _ao_queue;
+// QueueHandle_t _ao_queue; // NOTE: commenting for now
 
 // constantes definidas para facilitar el debugging del programa
 static char *QUEUE_ID_1 = "Queue_id_1";
@@ -35,23 +35,26 @@ void active_object_init(active_object_t *obj,
                         size_t queue_size,
                         uint8_t task_priority) {
 
+    obj->event_size = sizeof(event_data_t);
+    obj->event_queue = xQueueCreate(queue_size, obj->event_size);
+    configASSERT(NULL != obj->event_queue);
+    vQueueAddToRegistry(obj->event_queue, get_queue_name(obj->obj_id));
+    obj->process_event = process_event;
+
+    // ao_queue = obj->event_queue;
+
+    while (NULL == obj->event_queue) {
+        // error
+    }
+
+	LOGGER_INFO("Created Active Object.\n");
+
 #ifdef ONLY_THREAD
     static bool init = false;
     if (init) {
     	return;
     }
 #endif
-
-    obj->event_size = sizeof(event_data_t);
-    obj->event_queue = xQueueCreate(queue_size, obj->event_size);
-    configASSERT(NULL != obj->event_queue);
-    vQueueAddToRegistry(obj->event_queue, get_queue_name(obj->obj_id));
-    obj->process_event = process_event;
-    _ao_queue = obj->event_queue;
-
-    while (NULL == obj->event_queue) {
-        // error
-    }
 
     BaseType_t status;
     status = xTaskCreate(active_object_task, "Task", configMINIMAL_STACK_SIZE, obj, task_priority, NULL);
@@ -80,12 +83,13 @@ void active_object_task(void *pv_parameters) {
     event_data_t payload = NULL;
 
     for (;;) {
-        if (xQueueReceive(obj->event_queue, &payload, portMAX_DELAY) == pdTRUE)
+        if (xQueueReceive(obj->event_queue, &payload, portMAX_DELAY) == pdTRUE) {
         	LOGGER_INFO("AO task: got payload from event queue.\n");
         	if (payload == NULL) {
         		LOGGER_INFO("AO task: payload is NULL.");
         	}
+			LOGGER_INFO("AO task: going to process payload.\n");
         	obj->process_event(payload);
-			LOGGER_INFO("AO task: processed event.\n");
+        }
     }
 }

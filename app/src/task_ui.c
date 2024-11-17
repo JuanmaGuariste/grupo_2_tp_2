@@ -82,15 +82,15 @@ void ui_process_event(event_data_t event) {
     switch (*(button_event->type)) {
         case BUTTON_TYPE_PULSE:
             LOGGER_INFO("UI processor: sending event to red led active object.\n");
-            // active_object_send_event(button_event->red_led_obj);
+            active_object_send_event(button_event->red_led_obj);
             break;
         case BUTTON_TYPE_SHORT:
             LOGGER_INFO("UI processor: sending event to green led active object.\n");
-            // active_object_send_event(button_event->green_led_obj);
+            active_object_send_event(button_event->green_led_obj);
             break;
         case BUTTON_TYPE_LONG:
             LOGGER_INFO("UI processor: sending event to blue led active object.\n");
-            // active_object_send_event(button_event->blue_led_obj);
+            active_object_send_event(button_event->blue_led_obj);
             break;
         default:
             LOGGER_INFO("Unknown button type: %d\n", *(button_event->type));

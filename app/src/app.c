@@ -78,9 +78,9 @@ void app_init(void)
 
   init_ui_active_object(&ui_interface, evt_process_callback, UI_AO_TASK_PRIORITY);
 
-  // init_led_active_object(&red_led_obj, LED_AO_TASK_PRIORITY);
-  // init_led_active_object(&green_led_obj, LED_AO_TASK_PRIORITY);
-  // init_led_active_object(&blue_led_obj, LED_AO_TASK_PRIORITY);
+  init_led_active_object(&red_led_obj, LED_AO_TASK_PRIORITY);
+  init_led_active_object(&green_led_obj, LED_AO_TASK_PRIORITY);
+  init_led_active_object(&blue_led_obj, LED_AO_TASK_PRIORITY);
 
   BaseType_t status;
 
