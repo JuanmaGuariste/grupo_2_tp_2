@@ -60,7 +60,6 @@ static void led_set_blue(void);
 static void led_set_green(void);
 static void led_set_red(void);
 
-
 /********************** internal data definition *****************************/
 
 /********************** external data definition *****************************/
@@ -114,6 +113,7 @@ void handle_blue_led_event(event_data_t event) {
 // }
 
 void init_led_active_object(active_object_t* hao, uint8_t priority) {
-  active_object_init(hao, evt_process_callback, MAX_QUEUE_LENGTH, priority);
+	LOGGER_INFO("Initializing LED Active Object with ID: %d\n", hao->obj_id);
+	active_object_init(hao, evt_process_callback, MAX_QUEUE_LENGTH, priority);
 }
 /********************** end of file ******************************************/

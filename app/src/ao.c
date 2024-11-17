@@ -65,31 +65,45 @@ void active_object_init(active_object_t *obj,
 #endif
 }
 
-
 void active_object_send_event(event_data_t event) {
     ao_event_t *evt = (ao_event_t*)event;
-	LOGGER_INFO("Going to send event to Active Object.\n");
-	if (evt == NULL) {
-		LOGGER_INFO("active_object_send_event event is NULL.\n");
-	}
-	LOGGER_INFO("active_object_send_event event is NOT NULL.\n");
-    xQueueSend(evt->hao->event_queue, &(evt->payload), 0);
-	LOGGER_INFO("Sent payload event to Active Object.\n");
+
+    if (evt == NULL || evt->hao == NULL) {
+        LOGGER_INFO("active_object_send_event: event is NULL.\n");
+        return;
+    }
+
+    if (evt->hao == NULL)
+    {
+        LOGGER_INFO("active_object_send_event: event is NULL.\n");
+    }
+    
+    LOGGER_INFO("active_object_send_event: Sending event to object ID: %d\n", evt->hao->obj_id);
+
+    BaseType_t status = xQueueSend(evt->hao->event_queue, &(evt->payload), 0);
+    if (status == pdPASS) {
+        LOGGER_INFO("active_object_send_event: Event successfully sent to queue.\n");
+    } else {
+        LOGGER_INFO("active_object_send_event: Failed to send event to queue (queue might be full).\n");
+    }
 }
 
 void active_object_task(void *pv_parameters) {
     active_object_t *obj = (active_object_t *) pv_parameters;
-
     event_data_t payload = NULL;
+
+    LOGGER_INFO("Active Object Task Started for Object ID: %d\n", obj->obj_id);
 
     for (;;) {
         if (xQueueReceive(obj->event_queue, &payload, portMAX_DELAY) == pdTRUE) {
-        	LOGGER_INFO("AO task: got payload from event queue.\n");
-        	if (payload == NULL) {
-        		LOGGER_INFO("AO task: payload is NULL.");
-        	}
-			LOGGER_INFO("AO task: going to process payload.\n");
-        	obj->process_event(payload);
+            LOGGER_INFO("Active Object Task: Received event for processing.\n");
+            if (payload == NULL) {
+                LOGGER_INFO("Active Object Task: Received NULL payload.\n");
+                continue;
+            }
+            obj->process_event(payload);
+        } else {
+            LOGGER_INFO("Active Object Task: Queue receive failed.\n");
         }
     }
 }

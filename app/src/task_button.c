@@ -142,7 +142,6 @@ void task_button(void* argument)
     		LOGGER_INFO("Button task: current object ID: %d", *((button_event_t *)event.payload )->current_obj_id);
 
     		active_object_send_event(&event);
-    		LOGGER_INFO("Button task: sent button event to UI active object.");
     	}
     }
     vTaskDelay((TickType_t)(TASK_PERIOD_MS_ / portTICK_PERIOD_MS));
