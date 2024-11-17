@@ -79,23 +79,27 @@ void ui_process_event(event_data_t event) {
         LOGGER_INFO("UI processor: current object ID is NULL.\n");
     }
 
+    // TODO: I think bug is here, I must replicate the way button task sends payload.
     switch (*(button_event->type)) {
         case BUTTON_TYPE_PULSE:
         	LOGGER_INFO("UI processor: Detected BUTTON_TYPE_PULSE.\n");
             LOGGER_INFO("UI processor: sending event to red led active object.\n");
             LOGGER_INFO("UI processor: RED LED Active Object ID: %d\n", button_event->red_led_obj->obj_id);
             LOGGER_INFO("UI processor: RED LED queue handle: %p\n", button_event->red_led_obj->event_queue);
+
             active_object_send_event(&button_event->red_led_obj);
             break;
         case BUTTON_TYPE_SHORT:
         	LOGGER_INFO("UI processor: Detected BUTTON_TYPE_SHORT.\n");
             LOGGER_INFO("UI processor: sending event to green led active object.\n");
+            LOGGER_INFO("UI processor: GREEN LED Active Object ID: %d\n", button_event->green_led_obj->obj_id);
             LOGGER_INFO("UI processor: GREEN LED queue handle: %p\n", button_event->green_led_obj->event_queue);
             active_object_send_event(&button_event->green_led_obj);
             break;
         case BUTTON_TYPE_LONG:
         	LOGGER_INFO("UI processor: Detected BUTTON_TYPE_LONG.\n");
             LOGGER_INFO("UI processor: sending event to blue led active object.\n");
+            LOGGER_INFO("UI processor: BLUE LED Active Object ID: %d\n", button_event->blue_led_obj->obj_id);
             LOGGER_INFO("UI processor: BLUE LED queue handle: %p\n", button_event->blue_led_obj->event_queue);
             active_object_send_event(&button_event->blue_led_obj);
             break;

@@ -84,7 +84,28 @@ void active_object_send_event(event_data_t event) {
         LOGGER_INFO("active_object_send_event: event is NULL.\n");
     }
     
-    LOGGER_INFO("active_object_send_event: Sending event to object ID: %d\n", evt->hao->obj_id);
+    LOGGER_INFO("active_object_send_event: sending event to object ID: %d\n", evt->hao->obj_id);
+
+    LOGGER_INFO("active_object_send_event send event: target queue handle: %p\n", evt->hao->event_queue);
+
+    // Even though payload payload is an abstract event_data_t i'm casting payload to button_event_t for debugging
+	button_event_t *button_event = (button_event_t *)evt->payload;
+
+	if (button_event) {
+		LOGGER_INFO("ao send event: Debugging Payload:");
+		LOGGER_INFO("  Current Object ID: %d\n",
+			button_event->current_obj_id ? *(button_event->current_obj_id) : -1);
+		LOGGER_INFO("  Button Type: %d\n",
+			button_event->type ? *(button_event->type) : -1);
+		LOGGER_INFO("  RED LED Queue Handle: %p\n",
+			button_event->red_led_obj ? button_event->red_led_obj->event_queue : NULL);
+		LOGGER_INFO("  GREEN LED Queue Handle: %p\n",
+			button_event->green_led_obj ? button_event->green_led_obj->event_queue : NULL);
+		LOGGER_INFO("  BLUE LED Queue Handle: %p\n",
+			button_event->blue_led_obj ? button_event->blue_led_obj->event_queue : NULL);
+	} else {
+		LOGGER_INFO("ao send event: Payload is NULL or not a button_event_t.\n");
+	}
 
     BaseType_t status = xQueueSend(evt->hao->event_queue, &(evt->payload), 0);
     if (status == pdPASS) {
@@ -104,13 +125,27 @@ void active_object_task(void *pv_parameters) {
     for (;;) {
         if (xQueueReceive(obj->event_queue, &payload, portMAX_DELAY) == pdTRUE) {
             LOGGER_INFO("Active Object Task: Received event for processing.\n");
+            LOGGER_INFO("Active Object Task queue handle check: %p\n", obj->event_queue);
+
             if (payload == NULL) {
                 LOGGER_INFO("Active Object Task: Received NULL payload.\n");
                 continue;
             }
+
+            // Even though payload payload is an abstract event_data_t i'm casting payload to button_event_t for debugging
+            button_event_t *button_event = (button_event_t *)payload;
+
+            LOGGER_INFO("Active Object Task: Debugging Payload:");
+            LOGGER_INFO("  Current Object ID: %d\n", button_event->current_obj_id ? *(button_event->current_obj_id) : -1);
+            LOGGER_INFO("  Button Type: %d\n", button_event->type ? *(button_event->type) : -1);
+            LOGGER_INFO("  RED LED Queue Handle: %p\n", button_event->red_led_obj->event_queue);
+            LOGGER_INFO("  GREEN LED Queue Handle: %p\n", button_event->green_led_obj->event_queue);
+            LOGGER_INFO("  BLUE LED Queue Handle: %p\n", button_event->blue_led_obj->event_queue);
+
             obj->process_event(payload);
         } else {
             LOGGER_INFO("Active Object Task: Queue receive failed.\n");
         }
     }
 }
+
