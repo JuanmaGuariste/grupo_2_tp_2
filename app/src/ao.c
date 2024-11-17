@@ -8,9 +8,12 @@
 #include "logger.h"
 #define ONLY_THREAD
 
-// QueueHandle_t _ao_queue; // NOTE: commenting for now
+// Shared global queue handle
+static QueueHandle_t shared_event_queue = NULL;
 
 // constantes definidas para facilitar el debugging del programa
+static char *QUEUE_ID_SHARED = "Shared_Queue"; // Queue global
+
 static char *QUEUE_ID_1 = "Queue_id_1";
 static char *QUEUE_ID_2 = "Queue_id_2";
 static char *QUEUE_ID_3 = "Queue_id_3";
@@ -34,25 +37,27 @@ void active_object_init(active_object_t *obj,
                         event_callback_t process_event,
                         size_t queue_size,
                         uint8_t task_priority) {
-
     obj->event_size = sizeof(event_data_t);
-    obj->event_queue = xQueueCreate(queue_size, obj->event_size);
-    configASSERT(NULL != obj->event_queue);
-    vQueueAddToRegistry(obj->event_queue, get_queue_name(obj->obj_id));
+
+    if (shared_event_queue == NULL) {
+        shared_event_queue = xQueueCreate(queue_size, obj->event_size);
+        configASSERT(NULL != shared_event_queue);
+        vQueueAddToRegistry(shared_event_queue, QUEUE_ID_SHARED);
+    }
+    obj->event_queue = shared_event_queue;
+
     obj->process_event = process_event;
-
-    // ao_queue = obj->event_queue;
-
     while (NULL == obj->event_queue) {
+        LOGGER_INFO("Event queue error.\n");
         // error
     }
 
-	LOGGER_INFO("Created Active Object.\n");
+    LOGGER_INFO("Created Active Object.\n");
 
 #ifdef ONLY_THREAD
     static bool init = false;
     if (init) {
-    	return;
+        return; // only 1 task for evt_process_callback must exist
     }
 #endif
 
@@ -64,6 +69,7 @@ void active_object_init(active_object_t *obj,
     init = true;
 #endif
 }
+
 
 void active_object_send_event(event_data_t event) {
     ao_event_t *evt = (ao_event_t*)event;
