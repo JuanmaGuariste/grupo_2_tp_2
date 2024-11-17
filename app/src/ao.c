@@ -85,7 +85,6 @@ void active_object_send_event(event_data_t event) {
     }
     
     LOGGER_INFO("active_object_send_event: sending event to object ID: %d\n", evt->hao->obj_id);
-
     LOGGER_INFO("active_object_send_event send event: target queue handle: %p\n", evt->hao->event_queue);
 
     // Even though payload payload is an abstract event_data_t i'm casting payload to button_event_t for debugging

@@ -49,6 +49,8 @@
 /*****************************************************************************/
 #include "ao.h"
 #include "ao_controller.h"
+#include "app.h"
+
 /********************** macros and definitions *******************************/
 
 /********************** internal data declaration ****************************/
@@ -79,29 +81,41 @@ void ui_process_event(event_data_t event) {
         LOGGER_INFO("UI processor: current object ID is NULL.\n");
     }
 
-    // TODO: I think bug is here, I must replicate the way button task sends payload.
+    // TODO: I think bug is here, payload breaks. I must replicate the way button task sends payload.
+    ao_event_t ao_event;
+
+	button_event_t *payload = pvPortMalloc(sizeof(button_event_t));
+
     switch (*(button_event->type)) {
         case BUTTON_TYPE_PULSE:
         	LOGGER_INFO("UI processor: Detected BUTTON_TYPE_PULSE.\n");
             LOGGER_INFO("UI processor: sending event to red led active object.\n");
             LOGGER_INFO("UI processor: RED LED Active Object ID: %d\n", button_event->red_led_obj->obj_id);
             LOGGER_INFO("UI processor: RED LED queue handle: %p\n", button_event->red_led_obj->event_queue);
-
-            active_object_send_event(&button_event->red_led_obj);
+            payload->current_obj_id = &(button_event->red_led_obj->obj_id);
+            ao_event.payload = payload;
+            ao_event.hao = button_event->red_led_obj;
+    		active_object_send_event(&ao_event);
             break;
         case BUTTON_TYPE_SHORT:
         	LOGGER_INFO("UI processor: Detected BUTTON_TYPE_SHORT.\n");
             LOGGER_INFO("UI processor: sending event to green led active object.\n");
             LOGGER_INFO("UI processor: GREEN LED Active Object ID: %d\n", button_event->green_led_obj->obj_id);
             LOGGER_INFO("UI processor: GREEN LED queue handle: %p\n", button_event->green_led_obj->event_queue);
-            active_object_send_event(&button_event->green_led_obj);
-            break;
+            payload->current_obj_id = &(button_event->green_led_obj->obj_id);
+            ao_event.payload = payload;
+            ao_event.hao = button_event->green_led_obj;
+    		active_object_send_event(&ao_event);
+    		break;
         case BUTTON_TYPE_LONG:
         	LOGGER_INFO("UI processor: Detected BUTTON_TYPE_LONG.\n");
             LOGGER_INFO("UI processor: sending event to blue led active object.\n");
             LOGGER_INFO("UI processor: BLUE LED Active Object ID: %d\n", button_event->blue_led_obj->obj_id);
             LOGGER_INFO("UI processor: BLUE LED queue handle: %p\n", button_event->blue_led_obj->event_queue);
-            active_object_send_event(&button_event->blue_led_obj);
+            payload->current_obj_id = &(button_event->blue_led_obj->obj_id);
+            ao_event.payload = payload;
+            ao_event.hao = button_event->blue_led_obj;
+    		active_object_send_event(&ao_event);
             break;
         default:
             LOGGER_INFO("Unknown button type: %d\n", *(button_event->type));
