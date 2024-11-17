@@ -78,11 +78,6 @@ void active_object_send_event(event_data_t event) {
         LOGGER_INFO("active_object_send_event: event is NULL.\n");
         return;
     }
-
-    if (evt->hao == NULL)
-    {
-        LOGGER_INFO("active_object_send_event: event is NULL.\n");
-    }
     
     LOGGER_INFO("active_object_send_event: sending event to object ID: %d\n", evt->hao->obj_id);
     LOGGER_INFO("active_object_send_event send event: target queue handle: %p\n", evt->hao->event_queue);
@@ -93,9 +88,9 @@ void active_object_send_event(event_data_t event) {
 	if (button_event) {
 		LOGGER_INFO("ao send event: Debugging Payload:");
 		LOGGER_INFO("  Current Object ID: %d\n",
-			button_event->current_obj_id ? *(button_event->current_obj_id) : -1);
+			button_event->current_obj_id ? (button_event->current_obj_id) : -1);
 		LOGGER_INFO("  Button Type: %d\n",
-			button_event->type ? *(button_event->type) : -1);
+			button_event->type ? (button_event->type) : -1);
 		LOGGER_INFO("  RED LED Queue Handle: %p\n",
 			button_event->red_led_obj ? button_event->red_led_obj->event_queue : NULL);
 		LOGGER_INFO("  GREEN LED Queue Handle: %p\n",
@@ -135,8 +130,8 @@ void active_object_task(void *pv_parameters) {
             button_event_t *button_event = (button_event_t *)payload;
 
             LOGGER_INFO("Active Object Task: Debugging Payload:");
-            LOGGER_INFO("  Current Object ID: %d\n", button_event->current_obj_id ? *(button_event->current_obj_id) : -1);
-            LOGGER_INFO("  Button Type: %d\n", button_event->type ? *(button_event->type) : -1);
+            LOGGER_INFO("  Current Object ID: %d\n", button_event->current_obj_id ? (button_event->current_obj_id) : -1);
+            LOGGER_INFO("  Button Type: %d\n", button_event->type ? (button_event->type) : -1);
             LOGGER_INFO("  RED LED Queue Handle: %p\n", button_event->red_led_obj->event_queue);
             LOGGER_INFO("  GREEN LED Queue Handle: %p\n", button_event->green_led_obj->event_queue);
             LOGGER_INFO("  BLUE LED Queue Handle: %p\n", button_event->blue_led_obj->event_queue);

@@ -50,6 +50,7 @@
 #include "ao.h"
 #include "ao_controller.h"
 #include "app.h"
+#include "memory.h"
 
 /********************** macros and definitions *******************************/
 
@@ -70,28 +71,36 @@ void init_ui_active_object(active_object_t *ui_obj, void (*callback)(event_data_
   active_object_init(ui_obj, callback , MAX_QUEUE_LENGTH, priority);
 }
 
+static void ui_evt_free_callback (button_event_t * payload)
+{
+	if (payload != NULL) vFREE((void*)payload);
+}
+
 void ui_process_event(event_data_t event) {
     button_event_t *button_event = (button_event_t *) event;
 
-    LOGGER_INFO("UI processor: got button type = %d\n", *(button_event->type));
+    LOGGER_INFO("UI processor: got button type = %d\n", (button_event->type));
 
-    if (button_event->current_obj_id != NULL) {
-        LOGGER_INFO("UI processor: current object ID: %d\n", *(button_event->current_obj_id));
+    if (button_event->current_obj_id) {
+        LOGGER_INFO("UI processor: current object ID: %d\n", (button_event->current_obj_id));
     } else {
         LOGGER_INFO("UI processor: current object ID is NULL.\n");
     }
 
     ao_event_t ao_event;
 
-	button_event_t *payload = pvPortMalloc(sizeof(button_event_t));
+	button_event_t *payload = pvMALLOC(sizeof(button_event_t));
+    configASSERT(payload != NULL);
 
-    switch (*(button_event->type)) {
+    payload->free_payload = (event_callback_t)ui_evt_free_callback;
+    switch (button_event->type)
+    {
         case BUTTON_TYPE_PULSE:
         	LOGGER_INFO("UI processor: Detected BUTTON_TYPE_PULSE.\n");
             LOGGER_INFO("UI processor: sending event to red led active object.\n");
             LOGGER_INFO("UI processor: RED LED Active Object ID: %d\n", button_event->red_led_obj->obj_id);
             LOGGER_INFO("UI processor: RED LED queue handle: %p\n", button_event->red_led_obj->event_queue);
-            payload->current_obj_id = &(button_event->red_led_obj->obj_id);
+            payload->current_obj_id = (button_event->red_led_obj->obj_id);
             ao_event.payload = payload;
             ao_event.hao = button_event->red_led_obj;
     		active_object_send_event(&ao_event);
@@ -101,7 +110,7 @@ void ui_process_event(event_data_t event) {
             LOGGER_INFO("UI processor: sending event to green led active object.\n");
             LOGGER_INFO("UI processor: GREEN LED Active Object ID: %d\n", button_event->green_led_obj->obj_id);
             LOGGER_INFO("UI processor: GREEN LED queue handle: %p\n", button_event->green_led_obj->event_queue);
-            payload->current_obj_id = &(button_event->green_led_obj->obj_id);
+            payload->current_obj_id = (button_event->green_led_obj->obj_id);
             ao_event.payload = payload;
             ao_event.hao = button_event->green_led_obj;
     		active_object_send_event(&ao_event);
@@ -111,13 +120,13 @@ void ui_process_event(event_data_t event) {
             LOGGER_INFO("UI processor: sending event to blue led active object.\n");
             LOGGER_INFO("UI processor: BLUE LED Active Object ID: %d\n", button_event->blue_led_obj->obj_id);
             LOGGER_INFO("UI processor: BLUE LED queue handle: %p\n", button_event->blue_led_obj->event_queue);
-            payload->current_obj_id = &(button_event->blue_led_obj->obj_id);
+            payload->current_obj_id = (button_event->blue_led_obj->obj_id);
             ao_event.payload = payload;
             ao_event.hao = button_event->blue_led_obj;
     		active_object_send_event(&ao_event);
             break;
         default:
-            LOGGER_INFO("Unknown button type: %d\n", *(button_event->type));
+            LOGGER_INFO("Unknown button type: %d\n", (button_event->type));
             break;
     }
 }

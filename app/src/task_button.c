@@ -46,6 +46,7 @@
 #include "task_ui.h"
 #include "task_button.h"
 #include "ao.h"
+#include "memory.h"
 
 /********************** macros and definitions *******************************/
 
@@ -102,8 +103,9 @@ static button_type_t button_process_state_(bool value)
   return ret;
 }
 /********************** external functions definition ************************/
-void button_evt_free_callback () {
-	// TODO: complete this.
+static void button_evt_free_callback (button_event_t * payload)
+{
+	if (payload != NULL) vFREE((void*)payload);
 }
 
 void task_button(void* argument)
@@ -128,18 +130,19 @@ void task_button(void* argument)
 
     	event.hao = ui_interface->ui_obj;
 
-    	button_event_t *payload = pvPortMalloc(sizeof(button_event_t));
+    	button_event_t *payload = pvMALLOC(sizeof(button_event_t));
 
-    	if (payload != NULL){
+    	if (payload != NULL) {
     		payload->blue_led_obj = ui_interface->blue_led;
     		payload->green_led_obj = ui_interface->green_led;
     		payload->red_led_obj = ui_interface->red_led;
-    		payload->type = &type;
-    		payload->current_obj_id =  &(ui_interface->ui_obj->obj_id);
+    		payload->type = type;
+    		payload->current_obj_id =  ui_interface->ui_obj->obj_id;
+    		payload->free_payload = (event_callback_t)button_evt_free_callback;
 
     		event.payload = payload;
 
-    		LOGGER_INFO("Button task: current object ID: %d", *((button_event_t *)event.payload )->current_obj_id);
+    		LOGGER_INFO("Button task: current object ID: %d", ((button_event_t *)event.payload )->current_obj_id);
     		LOGGER_INFO("Button task: UI queue handle: %p\n", (void *)((active_object_t *)event.hao)->event_queue);
 
     		active_object_send_event(&event);
