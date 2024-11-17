@@ -84,7 +84,7 @@ void active_object_send_event(event_data_t event) {
     if (status == pdPASS) {
         LOGGER_INFO("active_object_send_event: Event successfully sent to queue.\n");
     } else {
-        LOGGER_INFO("active_object_send_event: Failed to send event to queue (queue might be full).\n");
+        LOGGER_INFO("active_object_send_event: Failed to send event to queue.\n");
     }
 }
 
