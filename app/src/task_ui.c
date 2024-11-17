@@ -78,8 +78,8 @@ static void ui_evt_free_callback (button_event_t * payload)
 
 void ui_process_event(event_data_t event) {
     button_event_t *button_event = (button_event_t *) event;
-
-    LOGGER_INFO("UI processor: got button type = %d\n", (button_event->type));
+    static int count = 0;
+    LOGGER_INFO("UI processor: got button type = %d, count : %d\n", (button_event->type), count);
 
     if (button_event->current_obj_id) {
         LOGGER_INFO("UI processor: current object ID: %d\n", (button_event->current_obj_id));
@@ -129,5 +129,6 @@ void ui_process_event(event_data_t event) {
             LOGGER_INFO("Unknown button type: %d\n", (button_event->type));
             break;
     }
+    count++;
 }
 /********************** end of file ******************************************/

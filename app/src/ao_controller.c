@@ -4,6 +4,7 @@
 *
 */
 #include "ao_controller.h"
+#include "memory.h"
 
 void evt_process_callback (event_data_t event)
 {
@@ -47,7 +48,10 @@ void evt_process_callback (event_data_t event)
       break;
     default:
     break;
-
-    payload->free_payload(payload);
   }
+  payload->free_payload(payload);
+  
+  // Se agrega solo con el fin de trackear memoria
+  if (payload->current_obj_id == BLUE_LED_AO_ID)
+  	  FINALIZE_TRACKING
 }

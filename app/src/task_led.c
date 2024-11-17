@@ -103,7 +103,6 @@ void handle_blue_led_event(event_data_t event) {
 //  LOGGER_INFO("Se ejecuta handle_blue_led_event");
   led_set_blue();
   LOGGER_INFO("BLUE led.\n");
-  FINALIZE_TRACKING
 }
 
 // void init_led_active_object(active_object_t *led_obj, void (*callback)(event_data_t), uint8_t priority) {

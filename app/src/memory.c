@@ -71,13 +71,16 @@ static void remove_memory_to_register (uint32_t pointer) {
 
 void finalize_tracking (void) {
   uint8_t index = 0;
+  bool memory_leaks_detected = false;
 
   while (index < sizeof(memory_buffer)/sizeof(memory_t)) {
     if (memory_buffer[index].reserved) {
       LOGGER_INFO("Memoria no liberada : 0x%lx",memory_buffer[index].addr);
       LOGGER_INFO("en el archivo %s", memory_buffer[index].file);
       LOGGER_INFO("linea: %lu", memory_buffer[index].line);
+      memory_leaks_detected = true;
     }
     index++;
   }
+  if (!memory_leaks_detected) LOGGER_INFO("No se detectaron memory leaks");
 }
