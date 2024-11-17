@@ -103,7 +103,7 @@ static button_type_t button_process_state_(bool value)
 }
 /********************** external functions definition ************************/
 void button_evt_free_callback () {
-
+	// TODO: complete this.
 }
 
 void task_button(void* argument)

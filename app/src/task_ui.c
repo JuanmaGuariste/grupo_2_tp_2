@@ -81,7 +81,6 @@ void ui_process_event(event_data_t event) {
         LOGGER_INFO("UI processor: current object ID is NULL.\n");
     }
 
-    // TODO: I think bug is here, payload breaks. I must replicate the way button task sends payload.
     ao_event_t ao_event;
 
 	button_event_t *payload = pvPortMalloc(sizeof(button_event_t));

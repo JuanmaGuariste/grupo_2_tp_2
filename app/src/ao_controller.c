@@ -44,7 +44,7 @@ void evt_process_callback (event_data_t event) {
       ui_process_event(payload);
       break;
     default:
-      // TODO: agregar callback de liberacion de memoria
+      // TODO: agregar callback de liberacion de memoria.
     break;
   }
 }
