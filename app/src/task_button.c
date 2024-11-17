@@ -140,6 +140,7 @@ void task_button(void* argument)
     		event.payload = payload;
 
     		LOGGER_INFO("Button task: current object ID: %d", *((button_event_t *)event.payload )->current_obj_id);
+    		LOGGER_INFO("Button task: UI queue handle: %p\n", (void *)((active_object_t *)event.hao)->event_queue);
 
     		active_object_send_event(&event);
     	}

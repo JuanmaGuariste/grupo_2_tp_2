@@ -92,7 +92,8 @@ void active_object_task(void *pv_parameters) {
     active_object_t *obj = (active_object_t *) pv_parameters;
     event_data_t payload = NULL;
 
-    LOGGER_INFO("Active Object Task Started for Object ID: %d\n", obj->obj_id);
+    LOGGER_INFO("Active Object Task started for Object ID: %d\n", obj->obj_id);
+    LOGGER_INFO("Active Object Task queue handle: %p\n", obj->event_queue);
 
     for (;;) {
         if (xQueueReceive(obj->event_queue, &payload, portMAX_DELAY) == pdTRUE) {
