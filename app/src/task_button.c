@@ -134,15 +134,15 @@ void task_button(void* argument)
     		payload->blue_led_obj = ui_interface->blue_led;
     		payload->green_led_obj = ui_interface->green_led;
     		payload->red_led_obj = ui_interface->red_led;
-    		payload->current_obj_id =  &(ui_interface->ui_obj->obj_id);
     		payload->type = &type;
+    		payload->current_obj_id =  &(ui_interface->ui_obj->obj_id);
 
     		event.payload = payload;
 
     		LOGGER_INFO("Button task: current object ID: %d", *((button_event_t *)event.payload )->current_obj_id);
 
     		active_object_send_event(&event);
-    		LOGGER_INFO("Button task: sent button task event to UI active object.");
+    		LOGGER_INFO("Button task: sent button event to UI active object.");
     	}
     }
     vTaskDelay((TickType_t)(TASK_PERIOD_MS_ / portTICK_PERIOD_MS));

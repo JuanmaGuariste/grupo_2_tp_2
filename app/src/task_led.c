@@ -90,19 +90,19 @@ static void led_set_green(void) {
 void handle_red_led_event(event_data_t event) {
 //  LOGGER_INFO("Se ejecuta handle_red_led_event");
   led_set_red();
-  LOGGER_INFO("led red");
+  LOGGER_INFO("RED led.\n");
 }
 
 void handle_green_led_event(event_data_t event) {
 //  LOGGER_INFO("Se ejecuta handle_green_led_event");
   led_set_green();
-  LOGGER_INFO("led green");
+  LOGGER_INFO("GREEN led.\n");
 }
 
 void handle_blue_led_event(event_data_t event) {
 //  LOGGER_INFO("Se ejecuta handle_blue_led_event");
   led_set_blue();
-  LOGGER_INFO("led blue");
+  LOGGER_INFO("BLUE led.\n");
 }
 
 // void init_led_active_object(active_object_t *led_obj, void (*callback)(event_data_t), uint8_t priority) {

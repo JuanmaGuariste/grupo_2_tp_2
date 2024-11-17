@@ -7,6 +7,7 @@
 
 void evt_process_callback (event_data_t event) {
   if (event == NULL) {
+	  LOGGER_INFO("evt_process_callback: got NULL event.\n");
 	  return;
   }
   LOGGER_INFO("evt_process_callback: got event.\n");

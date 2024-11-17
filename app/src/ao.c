@@ -15,6 +15,7 @@ static char *QUEUE_ID_1 = "Queue_id_1";
 static char *QUEUE_ID_2 = "Queue_id_2";
 static char *QUEUE_ID_3 = "Queue_id_3";
 static char *QUEUE_ID_4 = "Queue_id_4";
+
 static char *QUEUE_ID_DEF = "Queue_id_default";
 
  char *get_queue_name( uint8_t id) {
@@ -36,23 +37,20 @@ void active_object_init(active_object_t *obj,
 
 #ifdef ONLY_THREAD
     static bool init = false;
+    if (init) {
+    	return;
+    }
 #endif
 
     obj->event_size = sizeof(event_data_t);
     obj->event_queue = xQueueCreate(queue_size, obj->event_size);
-
     configASSERT(NULL != obj->event_queue);
-
     vQueueAddToRegistry(obj->event_queue, get_queue_name(obj->obj_id));
     obj->process_event = process_event;
     _ao_queue = obj->event_queue;
 
     while (NULL == obj->event_queue) {
         // error
-    }
-
-    if (init) {
-    	return; // we only allow 1 task to exist
     }
 
     BaseType_t status;
@@ -62,24 +60,32 @@ void active_object_init(active_object_t *obj,
 #ifdef ONLY_THREAD
     init = true;
 #endif
-
-	LOGGER_INFO("Created active_object_task.\n");
 }
+
 
 void active_object_send_event(event_data_t event) {
     ao_event_t *evt = (ao_event_t*)event;
-	LOGGER_INFO("Going to send payload event to Active Object.\n");
+	LOGGER_INFO("Going to send event to Active Object.\n");
+	if (evt == NULL) {
+		LOGGER_INFO("active_object_send_event event is NULL.\n");
+	}
+	LOGGER_INFO("active_object_send_event event is NOT NULL.\n");
     xQueueSend(evt->hao->event_queue, &(evt->payload), 0);
 	LOGGER_INFO("Sent payload event to Active Object.\n");
 }
 
 void active_object_task(void *pv_parameters) {
     active_object_t *obj = (active_object_t *) pv_parameters;
+
     event_data_t payload = NULL;
 
     for (;;) {
         if (xQueueReceive(obj->event_queue, &payload, portMAX_DELAY) == pdTRUE)
         	LOGGER_INFO("AO task: got payload from event queue.\n");
-            obj->process_event(payload);
+        	if (payload == NULL) {
+        		LOGGER_INFO("AO task: payload is NULL.");
+        	}
+        	obj->process_event(payload);
+			LOGGER_INFO("AO task: processed event.\n");
     }
 }
