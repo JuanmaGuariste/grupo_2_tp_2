@@ -125,7 +125,7 @@ void task_button(void* argument)
     button_type_t type;
     type = button_process_state_(button_state);
 
-    if (type != BUTTON_TYPE_NONE){
+    if (type != BUTTON_TYPE_NONE) {
     	LOGGER_INFO("Button task: button type = %d", type);
 
     	event.hao = ui_interface->ui_obj;
@@ -145,7 +145,10 @@ void task_button(void* argument)
     		LOGGER_INFO("Button task: current object ID: %d", ((button_event_t *)event.payload )->current_obj_id);
     		LOGGER_INFO("Button task: UI queue handle: %p\n", (void *)((active_object_t *)event.hao)->event_queue);
 
-    		active_object_send_event(&event);
+    		BaseType_t status = active_object_send_event(&event);
+
+    		// Si algo falla libera los recursos asociados
+    		if (status != pdPASS) payload->free_payload(payload);
     	}
     }
     vTaskDelay((TickType_t)(TASK_PERIOD_MS_ / portTICK_PERIOD_MS));

@@ -71,35 +71,13 @@ void active_object_init(active_object_t *obj,
 }
 
 
-void active_object_send_event(event_data_t event) {
+BaseType_t active_object_send_event(event_data_t event) {
     ao_event_t *evt = (ao_event_t*)event;
 
     if (evt == NULL || evt->hao == NULL) {
         LOGGER_INFO("active_object_send_event: event is NULL.\n");
-        return;
+        return pdFAIL;
     }
-    
-    LOGGER_INFO("active_object_send_event: sending event to object ID: %d\n", evt->hao->obj_id);
-    LOGGER_INFO("active_object_send_event send event: target queue handle: %p\n", evt->hao->event_queue);
-
-    // NOTE: even though payload is an abstract event_data_t, I'm casting payload to button_event_t for debugging.
-	button_event_t *button_event = (button_event_t *)evt->payload;
-
-	if (button_event) {
-		LOGGER_INFO("ao send event: Debugging Payload:");
-		LOGGER_INFO("  Current Object ID: %d\n",
-			button_event->current_obj_id ? (button_event->current_obj_id) : -1);
-		LOGGER_INFO("  Button Type: %d\n",
-			button_event->type ? (button_event->type) : -1);
-		LOGGER_INFO("  RED LED Queue Handle: %p\n",
-			button_event->red_led_obj ? button_event->red_led_obj->event_queue : NULL);
-		LOGGER_INFO("  GREEN LED Queue Handle: %p\n",
-			button_event->green_led_obj ? button_event->green_led_obj->event_queue : NULL);
-		LOGGER_INFO("  BLUE LED Queue Handle: %p\n",
-			button_event->blue_led_obj ? button_event->blue_led_obj->event_queue : NULL);
-	} else {
-		LOGGER_INFO("ao send event: Payload is NULL or not a button_event_t.\n");
-	}
 
     BaseType_t status = xQueueSend(evt->hao->event_queue, &(evt->payload), 0);
     if (status == pdPASS) {
@@ -107,34 +85,15 @@ void active_object_send_event(event_data_t event) {
     } else {
         LOGGER_INFO("active_object_send_event: Failed to send event to queue.\n");
     }
+    return status;
 }
 
 void active_object_task(void *pv_parameters) {
     active_object_t *obj = (active_object_t *) pv_parameters;
     event_data_t payload = NULL;
 
-    LOGGER_INFO("Active Object Task started for Object ID: %d\n", obj->obj_id);
-    LOGGER_INFO("Active Object Task queue handle: %p\n", obj->event_queue);
-
     for (;;) {
         if (xQueueReceive(obj->event_queue, &payload, portMAX_DELAY) == pdTRUE) {
-            LOGGER_INFO("Active Object Task: Received event for processing.\n");
-            LOGGER_INFO("Active Object Task queue handle check: %p\n", obj->event_queue);
-
-            if (payload == NULL) {
-                LOGGER_INFO("Active Object Task: Received NULL payload.\n");
-                continue;
-            }
-
-            // NOTE: even though payload is an abstract event_data_t, I'm casting payload to button_event_t for debugging.
-            button_event_t *button_event = (button_event_t *)payload;
-
-            LOGGER_INFO("Active Object Task: Debugging Payload:");
-            LOGGER_INFO("  Current Object ID: %d\n", button_event->current_obj_id ? (button_event->current_obj_id) : -1);
-            LOGGER_INFO("  Button Type: %d\n", button_event->type ? (button_event->type) : -1);
-            LOGGER_INFO("  RED LED Queue Handle: %p\n", button_event->red_led_obj->event_queue);
-            LOGGER_INFO("  GREEN LED Queue Handle: %p\n", button_event->green_led_obj->event_queue);
-            LOGGER_INFO("  BLUE LED Queue Handle: %p\n", button_event->blue_led_obj->event_queue);
 
             obj->process_event(payload);
         } else {

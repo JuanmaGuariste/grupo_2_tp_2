@@ -38,7 +38,7 @@ void active_object_init(active_object_t *obj,
                         size_t queue_size,
                         uint8_t task_priority);
 
-void active_object_send_event(event_data_t event);
+BaseType_t active_object_send_event(event_data_t event);
 
 void active_object_task(void *pv_parameters);
 
