@@ -1,3 +1,6 @@
+#ifndef MEMORY_H
+#define MEMORY_H
+
 #include "app.h"
 #include <stdint.h>
 #include <stdbool.h>
@@ -10,3 +13,5 @@
 void *memory_alloc (size_t length, char* file, uint64_t line);
 void memory_free (void* pointer);
 void finalize_tracking (void);
+
+#endif // MEMORY_H
