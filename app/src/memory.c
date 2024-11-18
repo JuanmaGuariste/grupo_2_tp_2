@@ -7,7 +7,8 @@
 
 #define MEMORY_TRACKING
 
-typedef struct {
+typedef struct
+{
   uint32_t addr;
   char *file;
   uint32_t line;
@@ -19,11 +20,12 @@ memory_t memory_buffer[255] = { 0 };
 static void add_memory_to_register (uint32_t pointer, char* file, uint64_t line);
 static void remove_memory_to_register (uint32_t pointer);
 
-void *memory_alloc (size_t length, char* file, uint64_t line) {
+void *memory_alloc (size_t length, char* file, uint64_t line)
+{
   if (length == 0) return NULL;
-
   void *pointer = pvPortMalloc(length);
-  if (pointer != NULL) {
+  if (pointer != NULL)
+  {
     #ifdef MEMORY_TRACKING
     add_memory_to_register ((uint32_t)pointer,file, line);
     #endif
@@ -31,21 +33,23 @@ void *memory_alloc (size_t length, char* file, uint64_t line) {
   return pointer;
 }
 
-void memory_free (void* pointer) {
+void memory_free (void* pointer)
+{
   if (pointer == NULL) return;
-
   vPortFree(pointer);
-
   #ifdef MEMORY_TRACKING
   remove_memory_to_register ((uint32_t)pointer);
   #endif
 }
 
-static void add_memory_to_register (uint32_t pointer, char* file, uint64_t line) {
+static void add_memory_to_register (uint32_t pointer, char* file, uint64_t line)
+{
   uint8_t index = 0;
   bool finalized = false;
-  while (index < sizeof(memory_buffer)/sizeof(memory_t) && !finalized) {
-    if (!memory_buffer[index].reserved){
+  while (index < sizeof(memory_buffer)/sizeof(memory_t) && !finalized)
+  {
+    if (!memory_buffer[index].reserved)
+    {
       memory_buffer[index].addr = pointer;
       memory_buffer[index].file = file;
       memory_buffer[index].line = (uint32_t)line;
@@ -56,11 +60,14 @@ static void add_memory_to_register (uint32_t pointer, char* file, uint64_t line)
   }
 }
 
-static void remove_memory_to_register (uint32_t pointer) {
+static void remove_memory_to_register (uint32_t pointer)
+{
   uint8_t index = 0;
   bool finalized = false;
-  while (index < sizeof(memory_buffer)/sizeof(memory_t) && !finalized) {
-    if (memory_buffer[index].addr == pointer) {
+  while (index < sizeof(memory_buffer)/sizeof(memory_t) && !finalized)
+  {
+    if (memory_buffer[index].addr == pointer)
+    {
       memory_buffer[index].addr = 0x00;
       memory_buffer[index].reserved = false;
       finalized = true;
@@ -69,12 +76,14 @@ static void remove_memory_to_register (uint32_t pointer) {
   }
 }
 
-void finalize_tracking (void) {
+void finalize_tracking (void)
+{
   uint8_t index = 0;
   bool memory_leaks_detected = false;
-
-  while (index < sizeof(memory_buffer)/sizeof(memory_t)) {
-    if (memory_buffer[index].reserved) {
+  while (index < sizeof(memory_buffer)/sizeof(memory_t))
+  {
+    if (memory_buffer[index].reserved)
+    {
       LOGGER_INFO("Memoria no liberada : 0x%lx",memory_buffer[index].addr);
       LOGGER_INFO("en el archivo %s", memory_buffer[index].file);
       LOGGER_INFO("linea: %lu", memory_buffer[index].line);

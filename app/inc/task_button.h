@@ -55,7 +55,8 @@ typedef enum
   BUTTON_TYPE__N,
 } button_type_t;
 
-typedef struct {
+typedef struct
+{
     button_type_t type;
     active_object_t *red_led_obj;
     active_object_t *green_led_obj;

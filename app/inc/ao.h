@@ -16,11 +16,11 @@ typedef void (*event_callback_t)(event_data_t event);
 typedef struct
 {
     int id;
-   // ao_led_cb_t free_evt_callback;
     int value;
 } ao_led_message_t;
 
-typedef struct {
+typedef struct
+{
     QueueHandle_t event_queue;
     event_callback_t process_event;
     uint8_t event_size;

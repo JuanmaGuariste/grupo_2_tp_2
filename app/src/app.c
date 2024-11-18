@@ -39,13 +39,10 @@
 #include "logger.h"
 #include "dwt.h"
 #include "board.h"
-
 #include "task_button.h"
 #include "task_led.h"
 #include "task_ui.h"
-
 #include "ao.h"
-
 #include "ao_controller.h"
 
 /********************** macros and definitions *******************************/
@@ -53,14 +50,15 @@
 #define UI_AO_TASK_PRIORITY (tskIDLE_PRIORITY + 1)
 #define BUTTON_TASK_PRIORITY (tskIDLE_PRIORITY + 1)
 /********************** internal data declaration ****************************/
-  static active_object_t red_led_obj, green_led_obj, blue_led_obj, ui_interface;
+static active_object_t red_led_obj, green_led_obj, blue_led_obj, ui_interface;
 
-  static all_obt_t all_obj = {
-    .blue_led = &blue_led_obj,
-    .green_led = &green_led_obj,
-    .red_led = &red_led_obj,
-    .ui_obj = &ui_interface
-  };
+static all_obt_t all_obj =
+{
+	.blue_led = &blue_led_obj,
+	.green_led = &green_led_obj,
+	.red_led = &red_led_obj,
+	.ui_obj = &ui_interface
+};
 
 /********************** internal functions declaration ***********************/
 
@@ -75,24 +73,18 @@ void app_init(void)
   green_led_obj.obj_id = GREEN_LED_AO_ID;
   blue_led_obj.obj_id = BLUE_LED_AO_ID;
   ui_interface.obj_id = UI_INTERFACE_AO_ID;
-
   init_ui_active_object(&ui_interface, evt_process_callback, UI_AO_TASK_PRIORITY);
-
   init_led_active_object(&red_led_obj, LED_AO_TASK_PRIORITY);
   init_led_active_object(&green_led_obj, LED_AO_TASK_PRIORITY);
   init_led_active_object(&blue_led_obj, LED_AO_TASK_PRIORITY);
-
   BaseType_t status;
-
   status = xTaskCreate(task_button, "Button_Task", configMINIMAL_STACK_SIZE, &all_obj, BUTTON_TASK_PRIORITY, NULL);
   configASSERT(pdPASS == status);
   while (pdPASS != status)
   {
     // error
   }
-
   LOGGER_INFO("app init");
-
   cycle_counter_init();
 }
 

@@ -33,11 +33,9 @@
  */
 
 /********************** inclusions *******************************************/
-
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
-
 #include "main.h"
 #include "cmsis_os.h"
 #include "board.h"
@@ -51,7 +49,6 @@
 #include "ao_controller.h"
 #include "app.h"
 #include "memory.h"
-
 /********************** macros and definitions *******************************/
 
 /********************** internal data declaration ****************************/
@@ -67,7 +64,8 @@
 /********************** external functions definition ************************/
 
 /*************************************************************************** */
-void init_ui_active_object(active_object_t *ui_obj, void (*callback)(event_data_t), uint8_t priority) {
+void init_ui_active_object(active_object_t *ui_obj, void (*callback)(event_data_t), uint8_t priority)
+{
   active_object_init(ui_obj, callback , MAX_QUEUE_LENGTH, priority);
 }
 
@@ -76,17 +74,16 @@ static void ui_evt_free_callback (button_event_t * payload)
 	if (payload != NULL) vFREE((void*)payload);
 }
 
-void ui_process_event(event_data_t event) {
+void ui_process_event(event_data_t event)
+{
     button_event_t *button_event = (button_event_t *) event;
-
-    if (button_event->current_obj_id) {
+    if (button_event->current_obj_id)
+    {
         LOGGER_INFO("UI processor: current object ID: %d\n", (button_event->current_obj_id));
     } else {
         LOGGER_INFO("UI processor: current object ID is NULL.\n");
     }
-
     ao_event_t ao_event;
-
 	button_event_t *payload = pvMALLOC(sizeof(button_event_t));
     configASSERT(payload != NULL);
     BaseType_t status = pdFAIL;
@@ -109,14 +106,13 @@ void ui_process_event(event_data_t event) {
             LOGGER_INFO("Unknown button type: %d\n", (button_event->type));
             break;
     }
-
-    if (button_event->type != BUTTON_TYPE_NONE) {
+    if (button_event->type != BUTTON_TYPE_NONE)
+    {
         ao_event.payload = payload;
         status = active_object_send_event(&ao_event);
     }
     // Si la operación falla se deben liberar los recursos reservados
     if (status != pdPASS) payload->free_payload(payload);
-
 }
-
 /********************** end of file ******************************************/
+

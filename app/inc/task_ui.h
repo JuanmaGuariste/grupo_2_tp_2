@@ -47,8 +47,8 @@ extern "C" {
 /********************** macros ***********************************************/
 
 /********************** typedef **********************************************/
-
-typedef struct {
+typedef struct
+{
     active_object_t *ui_obj;
     active_object_t *red_led;
     active_object_t *green_led;

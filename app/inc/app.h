@@ -45,7 +45,8 @@ extern "C" {
 /********************** macros ***********************************************/
 #define MAX_QUEUE_LENGTH 1
 /********************** typedef **********************************************/
-typedef enum {
+typedef enum
+{
     RED_LED_AO_ID = 1,
     GREEN_LED_AO_ID,
     BLUE_LED_AO_ID,

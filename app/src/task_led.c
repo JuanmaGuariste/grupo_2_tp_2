@@ -37,7 +37,6 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
-
 #include "main.h"
 #include "cmsis_os.h"
 #include "board.h"
@@ -51,16 +50,13 @@
 #include "ao_controller.h"
 #include "memory.h"
 /********************** macros and definitions *******************************/
-
 #define TASK_PERIOD_MS_           (1000)
-
 /********************** internal data declaration ****************************/
 
 /********************** internal functions declaration ***********************/
 static void led_set_blue(void);
 static void led_set_green(void);
 static void led_set_red(void);
-
 /********************** internal data definition *****************************/
 
 /********************** external data definition *****************************/
@@ -69,49 +65,47 @@ static void led_set_red(void);
 
 /********************** external functions definition ************************/
 
-static void led_set_blue(void) {
+static void led_set_blue(void)
+{
   HAL_GPIO_WritePin(LED_BLUE_PORT, LED_BLUE_PIN, GPIO_PIN_SET);
   HAL_GPIO_WritePin(LED_RED_PORT, LED_RED_PIN, GPIO_PIN_RESET);
     HAL_GPIO_WritePin(LED_GREEN_PORT, LED_GREEN_PIN, GPIO_PIN_RESET);
 }
 
-static void led_set_red(void) {
+static void led_set_red(void)
+{
   HAL_GPIO_WritePin(LED_RED_PORT, LED_RED_PIN, GPIO_PIN_SET);
   HAL_GPIO_WritePin(LED_BLUE_PORT, LED_BLUE_PIN, GPIO_PIN_RESET);
   HAL_GPIO_WritePin(LED_GREEN_PORT, LED_GREEN_PIN, GPIO_PIN_RESET);
 }
 
-static void led_set_green(void) {
+static void led_set_green(void)
+{
   HAL_GPIO_WritePin(LED_GREEN_PORT, LED_GREEN_PIN, GPIO_PIN_SET);
   HAL_GPIO_WritePin(LED_BLUE_PORT, LED_BLUE_PIN, GPIO_PIN_RESET);
   HAL_GPIO_WritePin(LED_RED_PORT, LED_RED_PIN, GPIO_PIN_RESET);
 }
 /*****************************************************************************/
-void handle_red_led_event(event_data_t event) {
+void handle_red_led_event(event_data_t event)
+{
 //  LOGGER_INFO("Se ejecuta handle_red_led_event");
   led_set_red();
   LOGGER_INFO("RED led.\n");
 }
 
-void handle_green_led_event(event_data_t event) {
+void handle_green_led_event(event_data_t event)
+{
 //  LOGGER_INFO("Se ejecuta handle_green_led_event");
   led_set_green();
   LOGGER_INFO("GREEN led.\n");
 }
 
-void handle_blue_led_event(event_data_t event) {
+void handle_blue_led_event(event_data_t event)
+{
 //  LOGGER_INFO("Se ejecuta handle_blue_led_event");
   led_set_blue();
   LOGGER_INFO("BLUE led.\n");
 }
-
-// void init_led_active_object(active_object_t *led_obj, void (*callback)(event_data_t), uint8_t priority) {
-//     led_obj->event_size = sizeof(button_event_t);
-//     active_object_init(led_obj, callback, 5);
-//     BaseType_t status;
-//     status = xTaskCreate(active_object_task, "LED_Task", configMINIMAL_STACK_SIZE, led_obj, priority, NULL);
-//     configASSERT(pdPASS == status);
-// }
 
 void init_led_active_object(active_object_t* hao, uint8_t priority) {
 	LOGGER_INFO("Initializing LED Active Object with ID: %d\n", hao->obj_id);

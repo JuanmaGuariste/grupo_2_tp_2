@@ -41,12 +41,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
-
 #include "main.h"
 #include "cmsis_os.h"
-
 #include "logger.h"
-
 /********************** macros and definitions *******************************/
 
 /********************** internal data declaration ****************************/
@@ -60,7 +57,6 @@
 static char logger_msg_buffer_[LOGGER_CONFIG_MAXLEN];
 char* const logger_msg = logger_msg_buffer_;
 int logger_msg_len;
-
 /********************** internal functions definition ************************/
 
 /********************** external functions definition ************************/
