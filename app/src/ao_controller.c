@@ -28,7 +28,12 @@ void evt_process_callback (event_data_t event)
     break;
   }
   if (payload->free_payload != NULL) payload->free_payload(payload);
+
   // Se agrega solo con el fin de trackear memoria
   if (payload->current_obj_id == BLUE_LED_AO_ID)
   	  FINALIZE_TRACKING
+
+   // Elimina la tarea cuando ya no es necesaria
+   if (payload->current_obj_id != UI_INTERFACE_AO_ID)
+	   current_task_delete();
 }

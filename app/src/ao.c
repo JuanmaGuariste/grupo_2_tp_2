@@ -7,6 +7,9 @@
 #include "logger.h"
 #define ONLY_THREAD
 
+static bool is_thread_created = false;
+static int main_task_priority = tskIDLE_PRIORITY;
+
 // Shared global queue handle
 static QueueHandle_t shared_event_queue = NULL;
 // constantes definidas para facilitar el debugging del programa
@@ -60,6 +63,8 @@ void active_object_init(active_object_t *obj,
     configASSERT(pdPASS == status);
 #ifdef ONLY_THREAD
     init = true;
+    main_task_priority = task_priority;
+    is_thread_created = true;
 #endif
 }
 
@@ -71,20 +76,30 @@ BaseType_t active_object_send_event(event_data_t event)
         LOGGER_INFO("active_object_send_event: event is NULL.\n");
         return pdFAIL;
     }
-    BaseType_t status = xQueueSend(evt->hao->event_queue, &(evt->payload), 0);
-    if (status == pdPASS)
+#ifdef ONLY_THREAD
+    if (!is_thread_created)
+    {
+        BaseType_t task_status;
+        task_status = xTaskCreate(active_object_task, "Task", configMINIMAL_STACK_SIZE, evt->hao, main_task_priority, NULL);
+        configASSERT(pdPASS == task_status);
+        is_thread_created = true;
+    }
+#endif
+    BaseType_t queue_status = xQueueSend(evt->hao->event_queue, &(evt->payload), 0);
+    if (queue_status == pdPASS)
     {
         LOGGER_INFO("active_object_send_event: Event successfully sent to queue.\n");
     } else {
         LOGGER_INFO("active_object_send_event: Failed to send event to queue.\n");
     }
-    return status;
+    return queue_status;
 }
 
 void active_object_task(void *pv_parameters)
 {
     active_object_t *obj = (active_object_t *) pv_parameters;
     event_data_t payload = NULL;
+
     for (;;)
     {
         if (xQueueReceive(obj->event_queue, &payload, portMAX_DELAY) == pdTRUE)
@@ -94,4 +109,10 @@ void active_object_task(void *pv_parameters)
             LOGGER_INFO("Active Object Task: Queue receive failed.\n");
         }
     }
+}
+
+void current_task_delete (void)
+{
+    is_thread_created = false;
+    vTaskDelete(NULL);
 }

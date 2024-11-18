@@ -42,4 +42,6 @@ BaseType_t active_object_send_event(event_data_t event);
 
 void active_object_task(void *pv_parameters);
 
+void current_task_delete (void);
+
 #endif // ACTIVE_OBJECT_H
