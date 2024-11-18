@@ -37,7 +37,6 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
-
 #include "main.h"
 #include "cmsis_os.h"
 #include "board.h"
@@ -46,11 +45,10 @@
 #include "task_ui.h"
 #include "task_button.h"
 #include "ao.h"
-
+#include "memory.h"
 /********************** macros and definitions *******************************/
 
 #define TASK_PERIOD_MS_           (50)
-
 #define BUTTON_PERIOD_MS_         (TASK_PERIOD_MS_)
 #define BUTTON_PULSE_TIMEOUT_     (200)
 #define BUTTON_SHORT_TIMEOUT_     (1000)
@@ -102,45 +100,44 @@ static button_type_t button_process_state_(bool value)
   return ret;
 }
 /********************** external functions definition ************************/
-void button_evt_free_callback () {
-
+static void button_evt_free_callback (button_event_t * payload)
+{
+	if (payload != NULL) vFREE((void*)payload);
 }
 
 void task_button(void* argument)
 {
   all_obt_t *ui_interface = (all_obt_t *) argument;
   ao_event_t event;
-
-  // event.blue_led_obj = ui_interface->blue_led;
-  // event.green_led_obj = ui_interface->green_led;
-  // event.red_led_obj = ui_interface->red_led;
-
-  
+  LOGGER_INFO("Button task initialized");
   button_init_();
-
   while(true)
   {
-
     GPIO_PinState button_state;
     button_state = HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN);
     button_type_t type;
     type = button_process_state_(button_state);
-
-    if (type != BUTTON_TYPE_NONE){
-      event.hao = ui_interface->ui_obj;
-      button_event_t *payload = pvPortMalloc(sizeof(button_event_t));
-
-      if (payload != NULL){
-        payload->blue_led_obj = ui_interface->blue_led;
-        payload->green_led_obj = ui_interface->green_led;
-        payload->red_led_obj = ui_interface->red_led;
-        payload->current_obj_id = ui_interface->ui_obj->obj_id;
-        event.payload = payload;
-
-        active_object_send_event(&event);
-      }
+    if (type != BUTTON_TYPE_NONE)
+    {
+    	LOGGER_INFO("Button task: button type = %d", type);
+    	event.hao = ui_interface->ui_obj;
+    	button_event_t *payload = pvMALLOC(sizeof(button_event_t));
+    	if (payload != NULL)
+    	{
+    		payload->blue_led_obj = ui_interface->blue_led;
+    		payload->green_led_obj = ui_interface->green_led;
+    		payload->red_led_obj = ui_interface->red_led;
+    		payload->type = type;
+    		payload->current_obj_id =  ui_interface->ui_obj->obj_id;
+    		payload->free_payload = (event_callback_t)button_evt_free_callback;
+    		event.payload = payload;
+    		LOGGER_INFO("Button task: current object ID: %d", ((button_event_t *)event.payload )->current_obj_id);
+    		LOGGER_INFO("Button task: UI queue handle: %p\n", (void *)((active_object_t *)event.hao)->event_queue);
+    		BaseType_t status = active_object_send_event(&event);
+    		// Si algo falla libera los recursos asociados
+    		if (status != pdPASS) payload->free_payload(payload);
+    	}
     }
-
     vTaskDelay((TickType_t)(TASK_PERIOD_MS_ / portTICK_PERIOD_MS));
   }
 }

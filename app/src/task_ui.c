@@ -33,11 +33,9 @@
  */
 
 /********************** inclusions *******************************************/
-
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
-
 #include "main.h"
 #include "cmsis_os.h"
 #include "board.h"
@@ -49,6 +47,8 @@
 /*****************************************************************************/
 #include "ao.h"
 #include "ao_controller.h"
+#include "app.h"
+#include "memory.h"
 /********************** macros and definitions *******************************/
 
 /********************** internal data declaration ****************************/
@@ -64,33 +64,55 @@
 /********************** external functions definition ************************/
 
 /*************************************************************************** */
-void init_ui_active_object(active_object_t *ui_obj, void (*callback)(event_data_t), uint8_t priority) {
-  active_object_init(ui_obj,evt_process_callback,MAX_QUEUE_LENGTH,priority);
+void init_ui_active_object(active_object_t *ui_obj, void (*callback)(event_data_t), uint8_t priority)
+{
+  active_object_init(ui_obj, callback , MAX_QUEUE_LENGTH, priority);
 }
 
-void ui_process_event(event_data_t event) {
+static void ui_evt_free_callback (button_event_t * payload)
+{
+	if (payload != NULL) vFREE((void*)payload);
+}
+
+void ui_process_event(event_data_t event)
+{
     button_event_t *button_event = (button_event_t *) event;
-//    char *handler_to_exec = NULL;
-    
-    switch (button_event->type) {
-      case BUTTON_TYPE_PULSE:
-        active_object_send_event(button_event->red_led_obj, event);
-//        handler_to_exec = "button_event->red_led_obj";
-        break;
-      case BUTTON_TYPE_SHORT:
-        active_object_send_event(button_event->green_led_obj, event);
-//        handler_to_exec = "button_event->green_led_obj";
-        break;
-      case BUTTON_TYPE_LONG:
-        active_object_send_event(button_event->blue_led_obj, event);
-//        handler_to_exec = "button_event->blue_led_obj";
-        break;
-      default:
-        break;
+    if (button_event->current_obj_id)
+    {
+        LOGGER_INFO("UI processor: current object ID: %d\n", (button_event->current_obj_id));
+    } else {
+        LOGGER_INFO("UI processor: current object ID is NULL.\n");
     }
-//  LOGGER_INFO("Se ejecuta ui_process_event button type: %d\n"
-//              "handler a ejecutar: %s"
-//              ,button_event->type
-//              ,handler_to_exec);
+    ao_event_t ao_event;
+	button_event_t *payload = pvMALLOC(sizeof(button_event_t));
+    configASSERT(payload != NULL);
+    BaseType_t status = pdFAIL;
+    payload->free_payload = (event_callback_t)ui_evt_free_callback;
+    switch (button_event->type)
+    {
+        case BUTTON_TYPE_PULSE:
+            payload->current_obj_id = (button_event->red_led_obj->obj_id);
+            ao_event.hao = button_event->red_led_obj;
+            break;
+        case BUTTON_TYPE_SHORT:
+            payload->current_obj_id = (button_event->green_led_obj->obj_id);
+            ao_event.hao = button_event->green_led_obj;
+    		break;
+        case BUTTON_TYPE_LONG:
+            payload->current_obj_id = (button_event->blue_led_obj->obj_id);
+            ao_event.hao = button_event->blue_led_obj;
+            break;
+        default:
+            LOGGER_INFO("Unknown button type: %d\n", (button_event->type));
+            break;
+    }
+    if (button_event->type != BUTTON_TYPE_NONE)
+    {
+        ao_event.payload = payload;
+        status = active_object_send_event(&ao_event);
+    }
+    // Si la operación falla se deben liberar los recursos reservados
+    if (status != pdPASS) payload->free_payload(payload);
 }
 /********************** end of file ******************************************/
+
